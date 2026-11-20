@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import { CanvasNodeReferenceBar } from "@/components/canvas/canvas-node-reference-bar";
 import { PromptOptimizeOptions } from "@/components/canvas/prompt-optimize-options";
+import { OriginalPromptDisclosure } from "@/components/canvas/canvas-node-prompt-panel";
 import { ImageSettingsPanel, ImageSettingsTheme, OptionPill } from "@/components/image-settings-panel";
 import { freeCardInfoFromSummary } from "@/lib/canvas/free-card-workflow";
 import { useConfigStore, useEffectiveConfig } from "@/stores/use-config-store";
@@ -271,6 +272,7 @@ export function CanvasFreeCardPanel({ node, nodes, connectedNodes, isRunning, on
         setOptimizeOptionsOpen(false);
         const useCloud = optimizeEngine === "cloud";
         const references = info && info.imageInputs > 0 ? imageReferences.slice(0, info.imageInputs) : [];
+        onChange({ promptOptimizeSource: text });
         setOptimizing(true);
         try {
             const result = await requestImagePromptOptimize(config, {
@@ -280,6 +282,7 @@ export function CanvasFreeCardPanel({ node, nodes, connectedNodes, isRunning, on
                 images: useCloud ? [] : references,
                 imageCount: references.length,
                 engine: optimizeEngine,
+                model: config.model || info?.id || "",
                 cloud: useCloud
                     ? {
                           baseUrl: (config.promptCloudBaseUrl || "").trim(),
@@ -288,6 +291,7 @@ export function CanvasFreeCardPanel({ node, nodes, connectedNodes, isRunning, on
                       }
                     : undefined,
             });
+            if (result.note) message.info(result.note);
             setPrompt(result.prompt);
             onChange({ prompt: result.prompt, composerContent: result.prompt });
         } catch (error) {
@@ -300,6 +304,27 @@ export function CanvasFreeCardPanel({ node, nodes, connectedNodes, isRunning, on
     const commitPrompt = () => {
         if (prompt !== (node.metadata?.prompt || "")) onChange({ prompt, composerContent: prompt });
     };
+
+    const replaceWithOriginalPrompt = () => {
+        const original = node.metadata?.promptOptimizeSource?.trim() || "";
+        if (!original) return;
+        setPrompt(original);
+        onChange({ prompt: original, composerContent: original });
+    };
+
+    const commitTextValue = (key: string, value: string) => {
+        onChange({ freeCardTextValues: { ...(node.metadata?.freeCardTextValues || {}), ...textValues, [key]: value } });
+    };
+
+    const buildFreeTexts = () =>
+        textInputs
+            .map((item, index) => {
+                if (index === 0) return { node: item.node, input: item.input, value: prompt };
+                const key = textKey(item);
+                if (!(key in textValues)) return null;
+                return { node: item.node, input: item.input, value: textValues[key] };
+            })
+            .filter((item): item is { node: string; input: string; value: string } => Boolean(item));
 
     const generate = () => {
         if (!info) {
@@ -433,6 +458,37 @@ export function CanvasFreeCardPanel({ node, nodes, connectedNodes, isRunning, on
                                     onChange={(event) => setPrompt(event.target.value)}
                                     onBlur={commitPrompt}
                                 />
+                                {node.metadata?.promptOptimizeSource?.trim() ? (
+                                    <OriginalPromptDisclosure
+                                        text={node.metadata.promptOptimizeSource.trim()}
+                                        label={t("canvas.promptPanel.originalPrompt")}
+                                        hint={t("canvas.promptPanel.originalPromptHint")}
+                                        replaceLabel={t("canvas.promptPanel.originalPromptReplace")}
+                                        onReplace={replaceWithOriginalPrompt}
+                                        theme={theme}
+                                    />
+                                ) : null}
+                                {extraTexts.map((item) => {
+                                    const key = textKey(item);
+                                    const value = textValues[key] ?? item.default;
+                                    return (
+                                        <div key={key} className="space-y-1">
+                                            <div className="flex items-center justify-between gap-2">
+                                                <span className="text-xs font-medium" style={{ color: theme.node.muted }}>
+                                                    {item.label}
+                                                </span>
+                                                <span className="text-[10px] opacity-50">#{item.node}</span>
+                                            </div>
+                                            <textarea
+                                                className="min-h-16 w-full resize-y rounded-xl border bg-transparent px-3 py-2 text-sm outline-none"
+                                                style={{ borderColor: theme.node.stroke, color: theme.node.text }}
+                                                value={value}
+                                                onChange={(event) => setTextValues((prev) => ({ ...prev, [key]: event.target.value }))}
+                                                onBlur={(event) => commitTextValue(key, event.target.value)}
+                                            />
+                                        </div>
+                                    );
+                                })}
                                 {optimizeOptionsOpen ? (
                                     <PromptOptimizeOptions
                                         className="mt-2"

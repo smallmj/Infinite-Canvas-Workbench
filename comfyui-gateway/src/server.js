@@ -11,6 +11,7 @@ import multer from "multer";
 import { buildContext } from "./bindings.js";
 import { imageInputCapacity } from "./base-models.js";
 import { createAssistantManager } from "./assistant.js";
+import { attachAssistantProxy, withAssistantProxyUrl } from "./assistant-proxy.js"; /* rp1105e */
 import { createComfyBridge } from "./comfy-bridge.js";
 import { createComfyClient } from "./comfy-client.js";
 import { createLogger, loadConfig } from "./config.js";
@@ -851,6 +852,7 @@ export async function createGatewayApp(overrides = {}) {
     }
     next();
   });
+  attachAssistantProxy(app, assistant, config); /* rp1105e 原始流透传，必须在 express.json 之前 */
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ extended: true, limit: "50mb" }));
   const upload = multer({
@@ -1222,7 +1224,7 @@ export async function createGatewayApp(overrides = {}) {
   });
 
   app.get("/api/assistant/status", async (_req, res) => {
-    res.json(await assistant.status());
+    res.json(withAssistantProxyUrl(config, await assistant.status())); /* rp1105e */
   });
 
   app.post("/api/assistant/ensure", async (req, res) => {
@@ -1239,10 +1241,10 @@ export async function createGatewayApp(overrides = {}) {
           ? result.canRepair ? "点右上角「重新解压」修复 Agent 运行时。" : result.canDownload ? "点「下载完整包」自动下载并解压 Agent 运行时。" : result.fullPackageUrl ? "打开完整包下载页，取出 assistant-runtime.zip 放到程序根目录后重启应用。" : "请安装包含 assistant-runtime 的完整包后重启应用。"
           : "检查网关日志中的 Agent 启动错误；修复后重新点击拉起。"),
       };
-      res.status(result.needFullPackage ? 409 : 503).json(payload);
+      res.status(result.needFullPackage ? 409 : 503).json(withAssistantProxyUrl(config, payload)); /* rp1105e */
       return;
     }
-    res.json(result);
+    res.json(withAssistantProxyUrl(config, result)); /* rp1105e */
   });
 
   app.post("/api/assistant/stop", async (_req, res) => {

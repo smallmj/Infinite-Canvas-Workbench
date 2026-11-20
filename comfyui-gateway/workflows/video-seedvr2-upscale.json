@@ -23,7 +23,7 @@
   "3": {
     "class_type": "SeedVR2LoadDiTModel",
     "inputs": {
-      "model": "seedvr2_ema_3b_fp8_e4m3fn.safetensors",
+      "model": "seedvr2_ema_3b_fp16.safetensors", "attention_mode": "sageattn_2",
       "device": "cuda:0"
     },
     "_meta": {

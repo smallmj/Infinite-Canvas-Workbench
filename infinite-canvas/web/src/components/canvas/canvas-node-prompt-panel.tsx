@@ -614,6 +614,8 @@ export function CanvasNodePromptPanel({ node, nodes, isRunning, onPromptChange, 
                 images,
                 imageCount: selectedRefs.length,
                 engine: optimizeEngine,
+                model: rawWorkflowId || config.model || "",
+                imageMode: imageModeValue || "t2i",
                 cloud: useCloud
                     ? {
                           baseUrl: (config.promptCloudBaseUrl || "").trim(),
@@ -1223,7 +1225,7 @@ export function CanvasNodePromptPanel({ node, nodes, isRunning, onPromptChange, 
                         </div>
                     ) : null}
                     {previewError ? <div className="text-xs text-[#ef4444]">{previewError}</div> : null}
-                    {mode !== "text" && originalPrompt ? <OriginalPromptDisclosure text={originalPrompt} label={t("canvas.promptPanel.originalPrompt")} hint={t("canvas.promptPanel.originalPromptHint")} theme={theme} /> : null}
+                    {mode !== "text" && originalPrompt ? <OriginalPromptDisclosure text={originalPrompt} label={t("canvas.promptPanel.originalPrompt")} hint={t("canvas.promptPanel.originalPromptHint")} replaceLabel={t("canvas.promptPanel.originalPromptReplace")} onReplace={() => applyPromptResult(originalPrompt)} theme={theme} /> : null}
                     {previewPrompt ? (
                         <>
                             <textarea
@@ -1266,7 +1268,7 @@ export function CanvasNodePromptPanel({ node, nodes, isRunning, onPromptChange, 
                 );
             })()}
             {mode !== "text" && originalPrompt && !optimizeRunning && !optimizeResult && !optimizeError ? (
-                <OriginalPromptDisclosure key={`${node.id}:${originalPrompt}`} text={originalPrompt} label={t("canvas.promptPanel.originalPrompt")} hint={t("canvas.promptPanel.originalPromptHint")} theme={theme} />
+                <OriginalPromptDisclosure key={`${node.id}:${originalPrompt}`} text={originalPrompt} label={t("canvas.promptPanel.originalPrompt")} hint={t("canvas.promptPanel.originalPromptHint")} replaceLabel={t("canvas.promptPanel.originalPromptReplace")} onReplace={() => applyPromptResult(originalPrompt)} theme={theme} />
             ) : null}
             <CanvasNodeCropDialog
                 dataUrl={swapTargetFrameUrl}
@@ -1305,7 +1307,7 @@ export function CanvasNodePromptPanel({ node, nodes, isRunning, onPromptChange, 
     );
 }
 
-function OriginalPromptDisclosure({ text, label, hint, theme }: { text: string; label: string; hint: string; theme: ReturnType<typeof useCanvasTheme> }) {
+export function OriginalPromptDisclosure({ text, label, hint, replaceLabel, onReplace, theme }: { text: string; label: string; hint: string; replaceLabel?: string; onReplace?: () => void; theme: ReturnType<typeof useCanvasTheme> }) {
     const [open, setOpen] = useState(false);
     return (
         <div className="mt-2 rounded-lg border" style={{ borderColor: theme.toolbar.border }}>
@@ -1315,13 +1317,22 @@ function OriginalPromptDisclosure({ text, label, hint, theme }: { text: string; 
                 <span className="ml-auto text-[10px] font-normal opacity-60">{hint}</span>
             </button>
             {open ? (
-                <textarea
-                    readOnly
-                    value={text}
-                    className="thin-scrollbar h-28 w-full resize-none border-t bg-transparent p-2 text-xs leading-5 outline-none"
-                    style={{ borderColor: theme.toolbar.border, color: theme.node.text }}
-                    onWheel={(event) => event.stopPropagation()}
-                />
+                <>
+                    <textarea
+                        readOnly
+                        value={text}
+                        className="thin-scrollbar h-28 w-full resize-none border-t bg-transparent p-2 text-xs leading-5 outline-none"
+                        style={{ borderColor: theme.toolbar.border, color: theme.node.text }}
+                        onWheel={(event) => event.stopPropagation()}
+                    />
+                    {onReplace ? (
+                        <div className="flex justify-end border-t px-2 py-1.5">
+                            <Button size="small" onClick={onReplace}>
+                                {replaceLabel || "Replace"}
+                            </Button>
+                        </div>
+                    ) : null}
+                </>
             ) : null}
         </div>
     );

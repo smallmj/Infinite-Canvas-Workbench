@@ -1,0 +1,9 @@
+内置助手运行时（assistant-runtime）
+
+本项目 MIT License，Copyright (c) 2026 1314521gjy。
+
+@mariozechner/pi-agent-core@0.73.1 与 @mariozechner/pi-ai@0.73.1：MIT License，Copyright (c) Mario Zechner，上游 https://github.com/badlogic/pi-mono 。
+
+随包包含服务端脚本、pi Agent 库及其依赖、画布前端工作区源码和 node_modules。随包 npm 依赖以 MIT / Apache-2.0 / BSD / ISC 为主，另含 MPL-2.0（lightningcss）、CC-BY-4.0（caniuse-lite）、Python-2.0、BlueOak、Unlicense 等许可；完整许可文本随包内 license/notice 文件提供；pi Agent 的完整 MIT 正文见包根 LICENSE.pi-agent.txt。未发现 GPL/AGPL/SSPL/LGPL。
+
+本运行时是画布助手桥，包含 pi Agent 执行器；不包含 Node.js 可执行文件，运行依赖应用自带 Node。
