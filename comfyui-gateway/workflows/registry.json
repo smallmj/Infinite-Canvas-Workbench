@@ -4461,7 +4461,7 @@
       "importedAt": "2026-11-18T17:57:34.369Z",
       "source": {
         "kind": "path",
-        "path": "D:\\ComfyUI-Local-Infinite-Canvas\\comfyui-gateway\\workflows\\image-minimax-h3-image-edit.json"
+        "path": "comfyui-gateway/workflows/image-minimax-h3-image-edit.json"
       }
     },
     {
@@ -4514,7 +4514,7 @@
       "importedAt": "2026-11-18T17:57:34.410Z",
       "source": {
         "kind": "path",
-        "path": "D:\\ComfyUI-Local-Infinite-Canvas\\comfyui-gateway\\workflows\\image-minimax-h3-image-t2i.json"
+        "path": "comfyui-gateway/workflows/image-minimax-h3-image-t2i.json"
       }
     }
   ]
