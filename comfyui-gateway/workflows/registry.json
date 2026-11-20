@@ -808,6 +808,28 @@
       "label": "H3（无VDN）"
     },
     {
+      "name": "video-h3-t2v-novdn",
+      "type": "video",
+      "hidden": true,
+      "file": "h3-ref2va-drama.json",
+      "description": "旧ID兼容条目：上游已并入 video-h3-ref2va-novdn（text 模式）。hidden 仅用于资源卡可用性展示，提交时由 legacyH3Model 重映射。",
+      "bindings": {},
+      "defaults": {},
+      "label": "H3 文生视频（无VDN·旧ID兼容）",
+      "id": "video-h3-t2v-novdn"
+    },
+    {
+      "name": "video-h3-frames-novdn",
+      "type": "video",
+      "hidden": true,
+      "file": "h3-ref2va-drama.json",
+      "description": "旧ID兼容条目：上游已并入 video-h3-ref2va-novdn（frames 模式）。hidden 仅用于资源卡可用性展示，提交时由 legacyH3Model 重映射。",
+      "bindings": {},
+      "defaults": {},
+      "label": "H3 首尾帧（无VDN·旧ID兼容）",
+      "id": "video-h3-frames-novdn"
+    },
+    {
       "id": "video-esrgan_2x",
       "name": "video-ESRGAN_2x放大",
       "type": "video",
