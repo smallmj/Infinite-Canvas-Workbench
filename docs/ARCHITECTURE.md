@@ -20,7 +20,7 @@ flowchart LR
   C --> M[models + custom_nodes]
   G -->|资源状态/安装| R[resources/index.json]
   R --> S[魔搭 / hf-mirror / aifasthub / 包内节点]
-  B -->|拉起一次| U[update.json 魔搭主 / GitHub 兜底]
+  B -->|拉起一次| U[update.json GitHub 主 / 魔搭兜底]
   G <-->|任务/锁/主模型/皮肤/setup| D[comfyui-gateway/data]
   B <-->|配置/项目/资产| LS[localStorage + IndexedDB]
 ```
@@ -97,7 +97,7 @@ flowchart LR
 
 ## 8. 更新链路
 
-- 清单 `update.json`：魔搭主源，GitHub raw 兜底，可用 `UPDATE_MANIFEST_URL(_BACKUP)` 覆盖。
+- 清单 `update.json`：GitHub raw 主源，魔搭兜底（任一处成功即用，GitHub 不可达时自动回落），可用 `UPDATE_MANIFEST_URL(_BACKUP)` 覆盖；补丁、完整包、assistant 运行时与模型/LoRA 下载地址仍全部在魔搭。
 - 应用内：`GET /api/update/check?fetch=1`、`POST /api/update/apply`（有任务在跑返回 409）。git 安装走 `fetch` + `pull --ff-only`（脏树拒绝）；归档安装校验 `size`+`sha256`，支持 `PATCH-DELETE.txt`、`PATCH_PROTECTED` 白名单保护，失败回滚，成功后 1.5s 调 launcher `/restart-gateway`。
 - 脏工作区：`git status --porcelain --untracked-files=no` 解析后忽略启动器生成的 `infinite-canvas/web/dist/config.js`；真实源码改动仍返回 `dirty`/`dirtyFiles`。真脏或 Git 不可用时，`POST /api/update/apply` 带 `force:true` 可改用已签名补丁覆盖程序文件，保留 data/models/node_modules/config，失败回滚；前端提供「强制更新（保留 data）」二次确认。
 - 归档补丁：更新器优先用 Windows `System32\tar.exe` 解压，PowerShell `Expand-Archive` 兜底并保留两边错误；默认清单超时 30s、补丁下载/应用 600s；`GET /api/update/progress` 提供下载进度、总量与速度。

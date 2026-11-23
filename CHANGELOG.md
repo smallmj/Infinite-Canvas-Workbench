@@ -6,6 +6,7 @@
 + [新增] 网关新增 `POST /v1/images/cutout` 与 `image-remove-bg` 工作流（卡片名「去背景（BiRefNet）」），复用已装的 `birefnet.safetensors`，不新增模型下载；该工作流不会混进生图模型下拉（没有输入图时点了必错）。ComfyUI 的 `RemoveBackground` 输出是"背景=1"的 mask，工作流内置 `InvertMask`，否则主体会被抠成透明。
 + [修复] 恢复 Qwen Image 2.1 的「透明背景」：v0.24.13 五合一迁移丢掉了 registry 的 `backgroundPrompt`，而网关仍要求它，导致 `background=transparent` 直接返回 400 `unsupported_background`；已补回并真机验证返回真 RGBA PNG（alpha 0–255）。
 + [修复] 画布快捷工具配置改为读取时合并新增的默认工具：此前新工具不会出现在已有用户的工具条上（`to3d` 在 v0.25.0 被 `scene3d` 顶掉后就这样静默消失了）。
++ [调整] 更新清单主源改为 GitHub raw，魔搭改为兜底源（先主后备，GitHub 不可达时自动回落）；代码更新走 git `origin/main`，补丁、完整包、assistant 运行时与模型/LoRA 下载地址仍全部在魔搭，未改动。
 
 ## v0.25.3 - 2026-11-18
 
