@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
-import { Brush, Camera, Copy, FileText, Grid2x2, LayoutGrid, Lock, LockOpen, Maximize2, Mountain, Scissors, Sparkles, Upload, ZoomIn } from "lucide-react";
+import { Brush, Camera, Copy, Eraser, FileText, Grid2x2, LayoutGrid, Lock, LockOpen, Maximize2, Mountain, Scissors, Sparkles, Upload, ZoomIn } from "lucide-react";
 
 import type { CanvasNodeData } from "@/types/canvas";
 import i18n from "@/i18n";
 
-export type ImageNodeActionToolId = "copyPrompt" | "reversePrompt" | "replace" | "resize" | "maskEdit" | "crop" | "split" | "upscale" | "superResolve" | "angle" | "fourView" | "to3d" | "scene3d" | "view";
+export type ImageNodeActionToolId = "copyPrompt" | "reversePrompt" | "replace" | "resize" | "maskEdit" | "crop" | "split" | "upscale" | "superResolve" | "removeBg" | "angle" | "fourView" | "to3d" | "scene3d" | "view";
 export type ImageQuickToolId = "info" | "delete" | "saveAsset" | "saveStyle" | "download" | ImageNodeActionToolId;
 
 export type ImageToolHandlers = {
@@ -15,6 +15,7 @@ export type ImageToolHandlers = {
     onSplit: (node: CanvasNodeData) => void;
     onUpscale: (node: CanvasNodeData) => void;
     onSuperResolve: (node: CanvasNodeData) => void;
+    onRemoveBg: (node: CanvasNodeData) => void;
     onAngle: (node: CanvasNodeData) => void;
     onFourView: (node: CanvasNodeData) => void;
     onTo3D: (node: CanvasNodeData) => void;
@@ -122,6 +123,14 @@ export const imageToolDefinitions: ImageToolDefinition[] = [
         run: (node, handlers) => handlers.onSuperResolve(node),
     },
     {
+        id: "removeBg",
+        defaultVisible: true,
+        label: () => i18n.t("canvas.imageTools.removeBg"),
+        title: () => i18n.t("canvas.imageTools.removeBgTitle"),
+        icon: () => <Eraser className="size-4" />,
+        run: (node, handlers) => handlers.onRemoveBg(node),
+    },
+    {
         id: "angle",
         defaultVisible: false,
         label: () => i18n.t("canvas.imageTools.angle"),
@@ -175,12 +184,18 @@ export function normalizeImageQuickToolIds(value: unknown[]) {
 }
 
 export function readImageQuickToolsConfig(value: unknown): ImageQuickToolsConfig {
-    const withScene3D = (ids: ImageQuickToolId[]): ImageQuickToolId[] => (ids.includes("scene3d") ? ids : [...ids, "scene3d"]);
-    if (Array.isArray(value)) return { ids: withScene3D(normalizeImageQuickToolIds(value)), showLabels: false };
+    // 新增的默认可见工具必须补进旧配置：否则用户存过的 id 数组里没有它，新按钮会静默消失（to3d 就是这么丢的）。
+    const withNewDefaultTools = (ids: ImageQuickToolId[]): ImageQuickToolId[] => {
+        let next = ids;
+        if (!next.includes("scene3d")) next = [...next, "scene3d"];
+        if (!next.includes("removeBg")) next = [...next, "removeBg"];
+        return next;
+    };
+    if (Array.isArray(value)) return { ids: withNewDefaultTools(normalizeImageQuickToolIds(value)), showLabels: false };
     if (!value || typeof value !== "object") return { ids: defaultImageQuickToolIds, showLabels: false };
     const data = value as Partial<ImageQuickToolsConfig>;
     return {
-        ids: Array.isArray(data.ids) ? withScene3D(normalizeImageQuickToolIds(data.ids)) : defaultImageQuickToolIds,
+        ids: Array.isArray(data.ids) ? withNewDefaultTools(normalizeImageQuickToolIds(data.ids)) : defaultImageQuickToolIds,
         showLabels: data.showLabels === true,
     };
 }

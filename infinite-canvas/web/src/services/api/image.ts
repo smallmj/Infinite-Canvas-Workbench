@@ -1360,6 +1360,36 @@ export async function requestUpscale(config: AiConfig, image: ReferenceImage, op
     }
 }
 
+export const REMOVE_BG_WORKFLOW_ID = "image-remove-bg";
+
+/** 一键去背景：把图片交给本地网关的 BiRefNet 工作流，拿回同尺寸、带 alpha 的 PNG。 */
+export async function requestRemoveBackground(config: AiConfig, image: ReferenceImage, options: RequestOptions = {}): Promise<Array<{ id: string; dataUrl: string }>> {
+    const baseConfig = resolveModelRequestConfig(config, config.imageModel || config.model);
+    const requestConfig = { ...baseConfig, baseUrl: LOCAL_GATEWAY_BASE_URL, apiKey: "local", apiFormat: "openai" as const, model: REMOVE_BG_WORKFLOW_ID };
+    const root = localGatewayRoot(requestConfig.baseUrl);
+    if (!root) throw new Error(apiText("image3dLocalOnly"));
+    const formData = new FormData();
+    formData.set("model", REMOVE_BG_WORKFLOW_ID);
+    formData.set("response_format", "b64_json");
+    formData.append("image", await dataUrlToFile({ ...image, dataUrl: await imageToDataUrl(image) }));
+    const requestId = `img_${nanoid()}`;
+    const detachCancel = attachLocalCancel(requestConfig, requestId, options.signal);
+    const detachProgress = attachLocalProgress(requestConfig, requestId, options.signal);
+    try {
+        const response = await axios.post<ImageApiResponse>(`${root}/v1/images/cutout`, formData, {
+            headers: { ...aiHeaders(requestConfig), ...(detachCancel ? { "X-Request-Id": requestId } : {}) },
+            signal: options.signal,
+            timeout: IMAGE_REQUEST_TIMEOUT_MS,
+        });
+        return await parseImagePayload(response.data);
+    } catch (error) {
+        throw new Error(readAxiosError(error, apiText("requestFailed")));
+    } finally {
+        detachCancel?.();
+        detachProgress?.();
+    }
+}
+
 export async function requestImageQuestion(config: AiConfig, messages: AiTextMessage[], onDelta: (text: string) => void, options?: RequestOptions) {    const requestConfig = resolveModelRequestConfig(config, config.model || config.textModel);
     const script = resolveModelScript(config, config.model || config.textModel);
     if (script) {

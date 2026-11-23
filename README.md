@@ -11,6 +11,7 @@
 - 图像：Z-Image Turbo、Krea2 Aesthetics、MOSS SFT（8 步极速 / 50 步高质量、区域布局）、Qwen Image 2.1（多图编辑 / 真蒙版局部重绘 / 扩图）。
 - 视频：MiniMax-H3 文生、首尾帧、多参三个入口，共用文戏均衡工作流；支持采样预览、LoRA 卡、首尾帧/多参考素材。
 - 放大：ESRGAN 快速放大、SeedVR2 图片超分、SeedVR2 视频超分（1.5×/2×，保留原音频）。
+- 抠图：图片节点一键「去背景」（BiRefNet），输出与原图同尺寸、带 alpha 的透明 PNG；权重用资源中心已有的 `background_removal/birefnet.safetensors`，不需要额外下载。
 - 本地插件卡：LoRA 强度卡、ComfyUI 参数卡、画布修复助手卡；提示词优化（H3 结构化 / 生图单段描述）。
 - 画布修复助手（Agent）：完整包内置，按需唤起；可用自己的云端文本 API 在本机定位并修复画布源码，用户确认后自动构建部署；3 分钟无提问自动休眠。应用内小补丁不含 Agent 工作区，卡片会提示下载完整包。
 - 本地反推 / 本地提示词：Qwen3.5-9B（GGUF + 视觉投影）和 Florence-2 PromptGen v2.0 可在「设置 → 添加工作流」按需安装；不装也能用云端反推。
@@ -116,6 +117,7 @@ v0.23.1 完整包内置「画布修复助手」卡片。它不是只读问答：
 
 - 健康检查：`GET http://127.0.0.1:8190/health`
 - 模型列表：`GET http://127.0.0.1:8190/v1/models`
+- 去背景：`POST http://127.0.0.1:8190/v1/images/cutout`（multipart `image`，单张图片，返回同尺寸、带 alpha 的 PNG）
 - 管理页：`http://127.0.0.1:8190/admin`
 - 工作流注册表：`comfyui-gateway/workflows/registry.json`
 - 工作流 = 模型；参数通过 bindings 映射到 ComfyUI 节点输入。

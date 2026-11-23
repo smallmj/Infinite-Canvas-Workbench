@@ -4539,6 +4539,45 @@
         "kind": "path",
         "path": "comfyui-gateway/workflows/image-minimax-h3-image-t2i.json"
       }
+    },
+    {
+      "id": "image-remove-bg",
+      "name": "image-remove-bg",
+      "label": "去背景（BiRefNet）",
+      "type": "image",
+      "category": "cutout",
+      "file": "image-remove-bg.json",
+      "description": "BiRefNet 一键抠图：保留主体、去掉背景，输出与原图同尺寸、带 alpha 的透明 PNG。",
+      "bindings": {
+        "image": {
+          "node": "1",
+          "input": "image",
+          "from": "image",
+          "imageIndex": 0,
+          "required": true
+        },
+        "bg_removal": {
+          "node": "2",
+          "input": "bg_removal_name",
+          "from": "params.bg_removal",
+          "default": "birefnet.safetensors"
+        }
+      },
+      "parameters": [
+        {
+          "key": "bg_removal",
+          "label": "去背景模型",
+          "type": "select",
+          "optionsFrom": "LoadBackgroundRemovalModel.bg_removal_name",
+          "default": "birefnet.safetensors"
+        }
+      ],
+      "defaults": {},
+      "presets": {},
+      "importedAt": "2026-11-23T15:10:00.000Z",
+      "source": {
+        "kind": "local"
+      }
     }
   ]
 }

@@ -5,7 +5,10 @@ import { Box, ChevronLeft, ChevronRight, Group, Mountain, Video } from "lucide-r
 import { saveAs } from "file-saver";
 import { useTranslation } from "react-i18next";
 
-import { requestEdit, requestGeneration, requestImageAngle, requestImageFourView, requestImageQuestion, requestImageTo3D, requestSceneTo3D, requestUpscale } from "@/services/api/image";
+import { requestEdit, requestGeneration, requestImageAngle, requestImageFourView, requestImageQuestion, requestImageTo3D, requestRemoveBackground, requestSceneTo3D, requestUpscale } from "@/services/api/image";
+
+/** 去背景（BiRefNet）的长边上限：超过就直接拒绝，绝不静默缩放。 */
+const REMOVE_BG_MAX_EDGE = 4096;
 import { createFreeWorkflowVideoTask, fetchFreeWorkflowSnapshot, fetchFreeWorkflows, requestFreeWorkflowImage, type FreeWorkflowOutputGroup, type FreeWorkflowSummary } from "@/services/api/free-workflow";
 import { bindStepProgress, unbindStepProgress, type GenerationStepProgress } from "@/services/api/step-progress";
 import { requestAudioGeneration, requestDialogueSpeech, storeGeneratedAudio } from "@/services/api/audio";
@@ -3245,6 +3248,69 @@ function InfiniteCanvasPage() {
     const runFastUpscale = useCallback(
         (node: CanvasNodeData, params: CanvasSuperResolveParams) => superResolveImageNode(node, params, t("canvas.superResolve.fastTitle")),
         [superResolveImageNode, t],
+    );
+
+    /** 去背景：调本地网关的 BiRefNet 抠图工作流，在原节点右侧生成一张同尺寸的透明 PNG。 */
+    const removeBgImageNode = useCallback(
+        async (node: CanvasNodeData) => {
+            if (!node.metadata?.content) return;
+            const meta = await readImageMeta(node.metadata.content);
+            if (Math.max(meta.width, meta.height) > REMOVE_BG_MAX_EDGE) {
+                message.warning(t("canvas.imageTools.removeBgTooLarge", { edge: REMOVE_BG_MAX_EDGE }));
+                return;
+            }
+            const childId = nanoid();
+            const imageConfig = NODE_DEFAULT_SIZE[CanvasNodeType.Image];
+            setRunningNodeId(childId);
+            setNodes((prev) => [
+                ...prev,
+                {
+                    id: childId,
+                    type: CanvasNodeType.Image,
+                    title: t("canvas.imageTools.removeBg"),
+                    position: { x: node.position.x + node.width + 96, y: node.position.y },
+                    width: imageConfig.width,
+                    height: imageConfig.height,
+                    metadata: { prompt: node.metadata?.prompt, status: NODE_STATUS_LOADING },
+                },
+            ]);
+            setConnections((prev) => [...prev, { id: nanoid(), fromNodeId: node.id, toNodeId: childId }]);
+            setSelectedNodeIds(new Set([childId]));
+            setDialogNodeId(childId);
+            const controller = startGenerationRequest(childId, node.id, childId);
+            try {
+                const image = await requestRemoveBackground(
+                    effectiveConfig,
+                    {
+                        id: node.id,
+                        name: `${node.title || node.id}.png`,
+                        type: node.metadata.mimeType || "image/png",
+                        dataUrl: node.metadata.content,
+                        storageKey: node.metadata.storageKey,
+                    },
+                    { signal: controller.signal },
+                ).then((items) => items[0]);
+                const uploaded = await uploadImage(image.dataUrl, { signal: controller.signal });
+                const size = fitNodeSize(uploaded.width, uploaded.height, imageConfig.width, imageConfig.height);
+                setNodes((prev) =>
+                    prev.map((item) =>
+                        item.id === childId
+                            ? { ...item, width: size.width, height: size.height, metadata: { ...item.metadata, ...imageMetadata(uploaded), status: NODE_STATUS_SUCCESS } }
+                            : item,
+                    ),
+                );
+            } catch (error) {
+                if (isGenerationCanceled(error)) return;
+                const errorDetails = error instanceof Error ? error.message : t("canvas.projectPage.generationFailed");
+                setNodes((prev) =>
+                    prev.map((item) => (item.id === childId ? { ...item, metadata: { ...item.metadata, status: NODE_STATUS_ERROR, errorDetails } } : item)),
+                );
+            } finally {
+                finishGenerationRequest(childId, controller);
+                setRunningNodeId(null);
+            }
+        },
+        [effectiveConfig, finishGenerationRequest, startGenerationRequest, t],
     );
 
     const upscaleVideoNode = useCallback(
@@ -8416,6 +8482,7 @@ function InfiniteCanvasPage() {
                     onSplit={(node) => setSplitNodeId(node.id)}
                     onUpscale={(node) => setUpscaleNodeId(node.id)}
                     onSuperResolve={(node) => setSuperResolveNodeId(node.id)}
+                    onRemoveBg={(node) => void removeBgImageNode(node)}
                     onAngle={(node) => setAngleNodeId(node.id)}
                     onFourView={(node) => void fourViewImageNode(node)}
                     onTo3D={(node) => setTo3dChoiceNodeId(node.id)}

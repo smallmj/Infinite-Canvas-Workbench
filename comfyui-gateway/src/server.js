@@ -1417,7 +1417,7 @@ export async function createGatewayApp(overrides = {}) {
     const degraded = status.phase === "degraded";
     const data = registry
       .listModels((setup.loaderOptions?.() || {}))
-      .filter((model) => (setup.isAvailable(model.baseId) || (degraded && setup.isKnownAvailable?.(model.baseId))) && !model.entry.hidden && model.entry.category !== "upscale" && !workflowVisibility.isHidden(model.entry.id))
+      .filter((model) => (setup.isAvailable(model.baseId) || (degraded && setup.isKnownAvailable?.(model.baseId))) && !model.entry.hidden && model.entry.category !== "upscale" && model.entry.category !== "cutout" && !workflowVisibility.isHidden(model.entry.id))
       .map((model) => ({
         id: model.modelId,
         object: "model",
@@ -2122,6 +2122,68 @@ export async function createGatewayApp(overrides = {}) {
       }
     }
     if (!data.length) throw new HttpError("超分工作流没有返回图片", { status: 502, code: "no_images" });
+    res.json({ created: Math.floor(Date.now() / 1000), data, seed: result.usedSeed ?? null });
+  });
+
+  // 去背景（抠图）：BiRefNet 一次性去底，输出原尺寸带 alpha 的 PNG；不缩放、超上限直接拒绝。
+  const CUTOUT_MAX_EDGE = 4096;
+  app.post("/v1/images/cutout", upload.any(), async (req, res) => {
+    await reloadRegistryAndSnapshot();
+    const body = req.body || {};
+    const entry = requireModel(registry, setup, body.model || "image-remove-bg", "image", { allowUnavailable: true });
+    if (entry.category !== "cutout") {
+      throw new HttpError(`模型 ${entry.name} 不是去背景工作流`, { status: 400, code: "not_cutout_workflow" });
+    }
+    const files = imageFilesFrom(req.files || []);
+    if (!files.length) throw new HttpError("去背景请求缺少输入图片", { status: 400, code: "missing_input_image" });
+    const pixelSize = mediaPixelSize(files[0].buffer, files[0].mimetype, files[0].originalname);
+    if (pixelSize && Math.max(pixelSize.width, pixelSize.height) > CUTOUT_MAX_EDGE) {
+      throw new HttpError(`图片长边 ${Math.max(pixelSize.width, pixelSize.height)} 超出去背景上限 ${CUTOUT_MAX_EDGE}，请先缩小再试。`, { status: 400, code: "cutout_image_too_large" });
+    }
+    const uploadedImages = await uploadImages(comfy, [files[0]]);
+    const context = buildContext({
+      count: 1,
+      images: [files[0]],
+      uploadedImages,
+      params: parseParams(body.params),
+    });
+    const abort = abortOnDisconnect(req, res, registerActiveRequest);
+    let result;
+    try {
+      result = await runImage({
+        entry,
+        context,
+        comfy,
+        timeoutMs: config.requestTimeoutMs,
+        pollIntervalMs: config.pollIntervalMs,
+        signal: abort.signal,
+        requestId: req.id,
+        logger,
+        loraCatalog: setup.loraNames(),
+        modelAliasFor: setup.modelAliasFor,
+        loaderSpecs: setup.modelLoaderSpecs?.(),
+      });
+    } catch (error) {
+      if (abort.signal.aborted) {
+        logger.info(`cutout ${entry.name} 请求被客户端中断 ${req.id}`);
+        return;
+      }
+      throw error;
+    } finally {
+      abort.cleanup();
+    }
+    logger.info(`cutout ${entry.name} -> ${result.promptId} (${result.files.length} file(s)) ${req.id}`);
+    const responseFormat = String(body.response_format || "b64_json").toLowerCase();
+    const data = [];
+    for (const file of result.files) {
+      if (responseFormat === "url") {
+        const saved = await tasks.saveOutput(randomId("img_"), file.buffer, extFromMime(file.mimeType, file.filename, "png"));
+        data.push({ url: absoluteTaskUrl(config, req, saved.url) });
+      } else {
+        data.push({ b64_json: file.buffer.toString("base64") });
+      }
+    }
+    if (!data.length) throw new HttpError("去背景工作流没有返回图片", { status: 502, code: "no_images" });
     res.json({ created: Math.floor(Date.now() / 1000), data, seed: result.usedSeed ?? null });
   });
 
