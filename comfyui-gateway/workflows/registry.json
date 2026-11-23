@@ -1404,7 +1404,8 @@
             }
           }
         }
-      }
+      },
+      "backgroundPrompt": "qwen-rgba"
     },
     {
       "id": "image-moss-image",
@@ -1623,7 +1624,7 @@
           "node": "1",
           "input": "unet_name",
           "from": "params.unet",
-          "default": "moss_image_sft_bf16.safetensors"
+          "default": "moss_image_sft_int8_convrot.safetensors"
         }
       },
       "parameters": [
