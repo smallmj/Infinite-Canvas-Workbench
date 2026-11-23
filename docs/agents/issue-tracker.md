@@ -8,7 +8,7 @@ Issue target: **`smallmj/ComfyUI-Local-Infinite-Canvas`** (this repo's fork).
 
 - Measured 2026-11-20: a bare `gh repo view` inside this clone resolves to the **upstream parent** (`1314521gjy/ComfyUI-Local-Infinite-Canvas`), not the fork. Every `gh issue …` and `gh label …` call must therefore pass `-R smallmj/ComfyUI-Local-Infinite-Canvas` explicitly.
 - Never file triage/tickets into the upstream repo. Upstream issues are only filed when the owner explicitly asks to report an upstream bug.
-- Upstream PRs follow the delivery discipline: local implementation → owner verifies on the real machine → only then `gh pr create -R 1314521gjy/ComfyUI-Local-Infinite-Canvas --base main --head <branch>`. Push feature branches to the fork (`origin`) first; sync the fork with `gh repo sync smallmj/ComfyUI-Local-Infinite-Canvas` before branching off upstream `main`.
+- **Upstream PRs: none.** The fork is the canonical trunk — do not `gh pr create` against the upstream repo, and do not push feature branches for upstream review. Upstream code is pulled for reference only (`git fetch upstream`), then private features are replayed onto the new release. See `AGENTS.md` → **Upstream relationship** for the evidence behind this rule.
 
 ## Conventions
 

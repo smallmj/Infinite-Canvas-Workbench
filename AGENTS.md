@@ -21,3 +21,16 @@ See `docs/agents/triage-labels.md`.
 
 Single-context layout: one `GLOSSARY.md` + `docs/adr/` at the repo root
 (created lazily by `/domain-modeling` when needed). See `docs/agents/domain.md`.
+
+### Upstream relationship
+
+This fork is the canonical trunk. **Do not open pull requests against the
+upstream repo** (`1314521gjy/ComfyUI-Local-Infinite-Canvas`). Upstream closes
+PRs without review or comment and absorbs their code into its own release
+commits — verified 2026-11-23: our #13 `randomId` MOSS fix (2026-10-31)
+shipped upstream as `d07f989` "MOSS non-secure-context fix" (2026-11-01)
+while the PR was closed unmerged and uncommented.
+
+Work lands on the fork's `main`. Upstream code is pulled for reference only
+(`git fetch upstream`), then private features are replayed onto the new
+release (`feat: replay private features onto …`). No upstream PRs, ever.
