@@ -8,8 +8,8 @@ export const REPO_LINKS = {
     modelscope: "https://modelscope.cn/datasets/shensanshu/ComfyUI-Local-Infinite-Canvas",
     modelscopeClone: "https://www.modelscope.cn/datasets/shensanshu/ComfyUI-Local-Infinite-Canvas.git",
     modelscopeRaw: "https://modelscope.cn/datasets/shensanshu/ComfyUI-Local-Infinite-Canvas/resolve/master",
-    github: "https://github.com/1314521gjy/ComfyUI-Local-Infinite-Canvas",
-    githubRaw: "https://raw.githubusercontent.com/1314521gjy/ComfyUI-Local-Infinite-Canvas/main",
+    github: "https://github.com/smallmj/Infinite-Canvas-Workbench",
+    githubRaw: "https://raw.githubusercontent.com/smallmj/Infinite-Canvas-Workbench/main",
 };
 
 const CANVAS_REPAIR_SKILL = `# 画布修复全能助手（canvas-repair v0.3.2）

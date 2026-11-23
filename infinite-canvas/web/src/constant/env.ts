@@ -1,8 +1,8 @@
 export const APP_VERSION = __APP_VERSION__ || "dev";
 
-export const GITHUB_REPO_URL = import.meta.env.VITE_GITHUB_REPO_URL || "https://github.com/1314521gjy/ComfyUI-Local-Infinite-Canvas";
+export const GITHUB_REPO_URL = import.meta.env.VITE_GITHUB_REPO_URL || "https://github.com/smallmj/Infinite-Canvas-Workbench";
 
-export const GITHUB_REPO_RAW_URL = import.meta.env.VITE_GITHUB_REPO_RAW_URL || "https://raw.githubusercontent.com/1314521gjy/ComfyUI-Local-Infinite-Canvas/main";
+export const GITHUB_REPO_RAW_URL = import.meta.env.VITE_GITHUB_REPO_RAW_URL || "https://raw.githubusercontent.com/smallmj/Infinite-Canvas-Workbench/main";
 
 export const DOCS_URL = import.meta.env.VITE_DOC_URL || "https://docs.canvas.best";
 

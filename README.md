@@ -1,8 +1,8 @@
-# ComfyUI-本地无限画布
+# Infinite Canvas Workbench（无限画布工作台）
 
 本地优先的 **Infinite Canvas × ComfyUI** 集成：把开源无限画布、ComfyUI 工作流和本地网关接到一起，不依赖云端 API。
 
-> 当前版本 **v0.24.3**（2026-11-01）。GitHub 仓库 slug 使用 `ComfyUI-Local-Infinite-Canvas`（GitHub 仓库名只支持 ASCII）；项目中文名即 **ComfyUI-本地无限画布**。
+> 当前版本 **v0.24.3**（2026-11-01）。GitHub 仓库 slug 使用 `Infinite-Canvas-Workbench`（GitHub 仓库名只支持 ASCII）；项目中文名即 **无限画布工作台**。
 
 ## 功能
 
@@ -162,7 +162,7 @@ v0.23.1 完整包内置「画布修复助手」卡片。它不是只读问答：
 
 本项目基于 [basketikun/infinite-canvas](https://github.com/basketikun/infinite-canvas) v0.20.0（MIT，Copyright (c) 2026 basketikun）修改，保留其许可证与版权声明，详见 [`infinite-canvas/LICENSE`](infinite-canvas/LICENSE) 和 [`NOTICE.md`](NOTICE.md)。
 
-`comfyui-gateway`、`launcher` 及本地集成修改由 **1314521gjy** 编写，按 MIT 许可发布，详见根目录 [`LICENSE`](LICENSE)。
+`comfyui-gateway`、`launcher` 及本地集成代码的原始版权与许可声明保留在根目录 [`LICENSE`](LICENSE)。
 
 ComfyUI 本体、其余模型权重、LoRA 和第三方自定义节点适用各自许可证；完整发布包随包附带运行必需的节点与少量 VAE/LoRA，其余按工作流下载；本项目与 ComfyUI、MiniMax、阿里云通义千问、MOSS、字节跳动 SeedVR2 等项目的维护方无隶属关系。
 

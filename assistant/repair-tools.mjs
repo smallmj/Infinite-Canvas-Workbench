@@ -26,7 +26,7 @@ const PRIVATE_KEY_EXTENSIONS = new Set([".key", ".pem", ".p12", ".pfx", ".jks", 
 const REMOTE_ALLOW = [
     { host: "modelscope.cn", prefix: "/datasets/shensanshu/ComfyUI-Local-Infinite-Canvas/" },
     { host: "www.modelscope.cn", prefix: "/datasets/shensanshu/ComfyUI-Local-Infinite-Canvas/" },
-    { host: "raw.githubusercontent.com", prefix: "/1314521gjy/ComfyUI-Local-Infinite-Canvas/" },
+    { host: "raw.githubusercontent.com", prefix: "/smallmj/Infinite-Canvas-Workbench/" },
 ];
 
 function clip(value, size) {

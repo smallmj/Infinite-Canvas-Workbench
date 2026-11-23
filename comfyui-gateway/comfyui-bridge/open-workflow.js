@@ -9,7 +9,7 @@ const FALLBACK_MS = 12000;
 function showError(message) {
   console.error("[LocalCanvas]", message);
   const banner = document.createElement("div");
-  banner.textContent = `本地无限画布：${message}`;
+  banner.textContent = `无限画布工作台：${message}`;
   Object.assign(banner.style, {
     position: "fixed",
     left: "50%",

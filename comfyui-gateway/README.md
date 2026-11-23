@@ -112,4 +112,4 @@ npm test
 
 ## 许可证与署名
 
-网关代码由 1314521gjy 编写，按 MIT 许可发布；项目整体署名和第三方声明见仓库根目录 `LICENSE`、`NOTICE.md`、`THIRD_PARTY_NOTICES.md`。
+项目版权与许可声明见仓库根目录 `LICENSE`；第三方声明见 `NOTICE.md`、`THIRD_PARTY_NOTICES.md`。

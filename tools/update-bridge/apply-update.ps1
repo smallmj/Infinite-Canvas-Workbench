@@ -1,4 +1,4 @@
-﻿param(
+param(
     [string]$Root = "",
     [switch]$NoLaunch
 )
@@ -25,7 +25,7 @@ $Protected = @(
 
 $ManifestUrls = @(
     "https://www.modelscope.cn/datasets/shensanshu/ComfyUI-Local-Infinite-Canvas/resolve/master/update.json",
-    "https://raw.githubusercontent.com/1314521gjy/ComfyUI-Local-Infinite-Canvas/main/update.json"
+    "https://raw.githubusercontent.com/smallmj/Infinite-Canvas-Workbench/main/update.json"
 )
 
 # 离线包优先：脚本同目录放 manifest.json + 补丁文件时完全不联网。

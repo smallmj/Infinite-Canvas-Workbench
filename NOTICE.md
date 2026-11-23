@@ -1,6 +1,6 @@
 # NOTICE / 署名与修改说明
 
-## 上游项目
+## 基础项目
 
 本仓库包含 **Infinite Canvas** 的修改版：
 
@@ -22,14 +22,14 @@
 - 增加 MOSS 区域布局、Qwen 2.1 编辑/局部重绘/扩图、H3 三档视频、SeedVR2 视频超分等本地工作流入口。
 - 修复若干交互/类型问题（IMEs、蒙版编辑器、扩图视口、视频超分参数链等）。
 
-`comfyui-gateway/`、`launcher/` 和根目录脚本为本地集成新增代码，不在上游仓库中。
+`comfyui-gateway/`、`launcher/` 和根目录脚本为本地集成新增代码，不在 `basketikun/infinite-canvas` 原始仓库中。
 
 ## 本项目
 
-- 项目名：ComfyUI-本地无限画布
-- 作者：1314521gjy（GitHub）
+- 项目名：Infinite Canvas Workbench（无限画布工作台）
+- 维护：smallmj（GitHub）
 - 许可证：MIT License，见根目录 `LICENSE`
-- 仓库：https://github.com/1314521gjy/ComfyUI-Local-Infinite-Canvas
+- 仓库：https://github.com/smallmj/Infinite-Canvas-Workbench
 
 ## 第三方与模型
 
