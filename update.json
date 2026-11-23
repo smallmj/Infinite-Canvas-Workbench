@@ -2,7 +2,7 @@
   "version": "v0.25.3",
   "publishedAt": "2026-11-18",
   "notes": "v0.25.3：写歌新增快速（INT8）与质量（BF16）两档，默认快速并可按卡记忆；新增 oldx Qwen 2.1 人物替换 LoRA 资源卡（魔搭自托管）。",
-  "repository": "https://modelscope.cn/datasets/shensanshu/ComfyUI-Local-Infinite-Canvas",
+  "repository": "https://github.com/smallmj/Infinite-Canvas-Workbench",
   "downloadUrl": "https://modelscope.cn/datasets/shensanshu/ComfyUI-Local-Infinite-Canvas/resolve/master/patches/update-bridge.zip",
   "mirrors": {
     "modelscope": "https://modelscope.cn/datasets/shensanshu/ComfyUI-Local-Infinite-Canvas"
